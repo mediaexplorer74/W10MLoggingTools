@@ -82,9 +82,9 @@ namespace Telnet
             {
                 _port = 23;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-
+                Debug.WriteLine("[ex] Exception: " + ex.Message);
             }
             if (_tcpClient != null)
             {
@@ -159,14 +159,14 @@ namespace Telnet
                 {
                     WaitForMessage();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-
+                    Debug.WriteLine("[ex] Exception: " + ex.Message);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-
+                Debug.WriteLine("[ex] Exception: " + ex.Message);
             }
         }
 
@@ -188,9 +188,9 @@ namespace Telnet
                 {
                     OnMessageReceived(message);
                 }
-                catch (Exception e)
-                {
-
+                catch (Exception ex) 
+                { 
+                    Debug.WriteLine("[ex] Exception: " + ex.Message); 
                 }
             }
             catch (OperationCanceledException)
@@ -280,9 +280,9 @@ namespace Telnet
                     {
                         OnMessageReceived(message);
                     }
-                    catch (Exception ee)
+                    catch (Exception ex)
                     {
-
+                        Debug.WriteLine("[ex] Exception: " + ex.Message);
                     }
                 }
             }

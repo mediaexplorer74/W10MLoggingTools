@@ -1,7 +1,8 @@
 ﻿using ndtklib;
-using Registry;
+//using Registry;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -52,6 +53,8 @@ namespace Logging_Enabler
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("[ex] Exception: " + ex.Message);
+
                 Exceptions.CustomMessage("Error initializing Interop Capabilities");
             }
 
