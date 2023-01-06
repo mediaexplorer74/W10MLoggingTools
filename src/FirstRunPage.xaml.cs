@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -45,11 +46,6 @@ namespace Logging_Enabler
                 this.InitializeComponent();
 
 
-
-
-
-
-
                 progbar.IsEnabled = true;
 
                 CMDpresent.Text = "Checking capabilities, please wait...";
@@ -60,12 +56,13 @@ namespace Logging_Enabler
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("[ex] Exception: " + ex.Message);
                 progbar.IsEnabled = false;
 
                 Exceptions.ThrowFullError(ex);
             }
 
-        }
+        }//
 
         private async void Connect()
         {
@@ -80,6 +77,8 @@ namespace Logging_Enabler
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("[ex] Exception: " + ex.Message);
+
                 Exceptions.ThrowFullError(ex);
                 IsCMDPresent = false;
             }
@@ -123,11 +122,11 @@ namespace Logging_Enabler
                     dialogTask = ThrownException.ShowAsync();
 
                 }
-                catch (TaskCanceledException)
+                catch (TaskCanceledException ex)
                 {
-
-                    
+                    Debug.WriteLine("[ex] Exception: " + ex.Message);
                 }
+
                 DispatcherTimer dt = new DispatcherTimer();
                 dt.Interval = TimeSpan.FromSeconds(10);
                 dt.Tick += dt_Tick;
@@ -151,11 +150,14 @@ namespace Logging_Enabler
         private void LoopCmd_Tapped(object sender, TappedRoutedEventArgs e)
         {
             DataPackage dataPackage = new DataPackage();
-            string command = "checknetisolation loopbackexempt -a -n=WindowsLoggingTools_6dg21qtxnde1e";
+            
+            //string command = "checknetisolation loopbackexempt -a -n=WindowsLoggingTools_6dg21qtxnde1e";
+            string command = "checknetisolation loopbackexempt -a -n=W10MLoggingTools_5gyrq6psz227t";
+
             dataPackage.RequestedOperation = DataPackageOperation.Copy;
             dataPackage.SetText(command);
             Clipboard.SetContent(dataPackage);
-            Exceptions.CustomMessage("'checknetisolation loopbackexempt -a -n=WindowsLoggingTools_6dg21qtxnde1e' copied to clipboard");
+            Exceptions.CustomMessage("'" + command + "' copied to clipboard");
         }
     }
 }
