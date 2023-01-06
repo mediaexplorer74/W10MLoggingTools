@@ -22,7 +22,7 @@ This tool allows you to enable and view logs for a few different aspects of Wind
 ## Requirements:
 - Interop Unlocked
 - CMD access
-- Windows 10 build 10240 - 15254
+- WindowsMobile 10 build 10240 - 17763 ;)
 
 This is currently WIP so UI and features may change before release
 
