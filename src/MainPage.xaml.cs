@@ -22,7 +22,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using ndtklib;
-using Registry; // RnD
+
 
 // Logging_Enabler
 namespace Logging_Enabler
@@ -148,7 +148,7 @@ namespace Logging_Enabler
             }
 
             //RnD
-            await Task.Delay(3000);
+            await Task.Delay(2000);
 
             string results = "";
 
