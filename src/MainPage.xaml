@@ -15,7 +15,7 @@
                      HorizontalAlignment="Stretch"
                      Margin="0,5,0,0" Foreground="{ThemeResource SystemAccentColor}"
                      ></ProgressBar>
-        <Pivot x:Name="MainWindowPivot" Title="Windows Logging Tools">
+        <Pivot x:Name="MainWindowPivot" Title="Windows(10Mobile) Logging Tools">
             
             <PivotItem Header="Home">
                 <Grid>

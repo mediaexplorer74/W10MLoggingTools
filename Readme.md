@@ -8,11 +8,18 @@
 This tool allows you to enable and view logs for a few different aspects of Windows 10 Mobile
 
 ## Screenshots
-![W10MLoggingTools Compilation Success](Images/shot1.png)
+![](Images/shot1.png)
+![](Images/shot2.png)
+![](Images/shot3.png)
+![](Images/shot4.png)
+![](Images/shot5.png)
+![](Images/shot6.png)
+![](Images/shot7.png)
+![](Images/shot8.png)
 
 ## My 2 cents
-- A little WP-Logging-Tools research
-- App successfully compiled... but idk registry.dll role :))))
+- WP-Logging-Tools research provided
+- W10MLoggingTools "generated" (with minimal changes at async-await logics...)
 
 ## Types of logging available?
 - Windows Boot Logging (What drivers and files are loaded on startup)
@@ -31,11 +38,11 @@ This is currently WIP so UI and features may change before release
 ## References :: Credits
 - [Empyreal96](https://github.com/Empyreal96) for cool WP-Logging-Tools src code :)
 - [Bashar Astifan](https://github.com/basharast) with help testing
-- NDTKLib creator for the NDTK library
+- NDTKLib creator (Gustave Monce?) for the NDTK library
 - [Fadil Fadz](https://github.com/fadilfadz01) for CMD Injector
 
 ## ..
 AS IS :: No support :: RnD only :: DIY
 
 ## .
-m][e :: 2023
+m][e :: January, 7 2023

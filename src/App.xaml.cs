@@ -1,4 +1,6 @@
-﻿using System;
+﻿// App 
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,22 +18,20 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+// Logging_Enabler
 namespace Logging_Enabler
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
+    // App class
     sealed partial class App : Application
     {
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
+        // App 
         public App()
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-        }
+
+        }//App end
+
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -65,15 +65,19 @@ namespace Logging_Enabler
                 if (rootFrame.Content == null)
                 {
                     // When the navigation stack isn't restored navigate to the first page,
-                    // configuring the new page by passing required information as a navigation
-                    // parameter
-                    // rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    // configuring the new page by passing required information as a navigation parameter
+
                     IPropertySet roamingProperties = ApplicationData.Current.RoamingSettings.Values;
+                    
                     Package package = Package.Current;
                     string systemArchitecture = package.Id.Architecture.ToString();
+
+                    // First Run checks, if running on architecture other than ARM notify
+                    // the user (Development purposes only)
                     if (systemArchitecture != "Arm")
                     {
-                        Exceptions.CustomMessage("Detected " + systemArchitecture + " CPU, This is in test mode during development, release target is for ARM CPUs");
+                        Exceptions.CustomMessage("Detected " + systemArchitecture 
+                            + " CPU, This is in test mode during development, release target is for ARM CPUs");
                         rootFrame.Navigate(typeof(MainPage), e.Arguments);
                     }
                     else
@@ -94,7 +98,9 @@ namespace Logging_Enabler
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
-        }
+
+        }//OnLaunched end
+
 
         /// <summary>
         /// Invoked when Navigation to a certain page fails
@@ -104,7 +110,9 @@ namespace Logging_Enabler
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
-        }
+
+        }//OnNavigationFailed end
+
 
         /// <summary>
         /// Invoked when application execution is being suspended.  Application state is saved
@@ -118,6 +126,9 @@ namespace Logging_Enabler
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
-        }
-    }
-}
+
+        }//OnSuspending end
+
+    }// App class end
+
+}//Logging_Enabler namespace end

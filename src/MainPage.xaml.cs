@@ -1,5 +1,5 @@
-﻿using ndtklib;
-//using Registry;
+﻿// MainPage
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,14 +21,13 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using ndtklib;
+using Registry; // RnD
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
+// Logging_Enabler
 namespace Logging_Enabler
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
+    // MainPage class
     public sealed partial class MainPage : Page
     {
 
@@ -39,17 +38,20 @@ namespace Logging_Enabler
         bool IsUefiLogEnabled;
         NRPC rpc = new NRPC();
 
+        // MainPage
         public MainPage()
         {
             this.InitializeComponent();
+            
             AppBusy(true);
+
             MainWindowPivot.IsEnabled = false;
-            Task.Delay(2000);
+            
+                        
             HomeText.Text = "Welcome, this app will let you configure basic logging settings for this device";
             try
             {
                 rpc.Initialize();
-
             }
             catch (Exception ex)
             {
@@ -58,34 +60,122 @@ namespace Logging_Enabler
                 Exceptions.CustomMessage("Error initializing Interop Capabilities");
             }
 
+            //RnD it
             CheckLoggingStatus();
+
             AppBusy(false);
         }
 
+        /// <summary>
+        /// Check all the values for each logging option
+        /// </summary>
         public async void CheckLoggingStatus()
         {
-            await ApplicationData.Current.LocalFolder.CreateFileAsync("cmdstring.txt", CreationCollisionOption.ReplaceExisting);
-            await ApplicationData.Current.LocalFolder.CreateFileAsync("ntbtlog.txt", CreationCollisionOption.ReplaceExisting);
-            await ApplicationData.Current.LocalFolder.CreateFileAsync("ImgUpd.log", CreationCollisionOption.ReplaceExisting);
-            await ApplicationData.Current.LocalFolder.CreateFileAsync("ImgUpd.log.cbs.log", CreationCollisionOption.ReplaceExisting);
             try
             {
-                await client.Connect();
-
+                //await 
+                    ApplicationData.Current.LocalFolder.CreateFileAsync("cmdstring.txt",
+                    CreationCollisionOption.ReplaceExisting);
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("[ex] Exception 1: " + ex.Message);
                 Exceptions.ThrowFullError(ex);
                 return;
             }
-            // bootlog                 Yes
 
-            await client.Send("bcdedit /enum {default} > " + $"\"{LocalPath}\\cmdstring.txt\"");
-            string results = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
-            //Exceptions.CustomMessage(results);
+            try
+            {
+                //await 
+                    ApplicationData.Current.LocalFolder.CreateFileAsync("ntbtlog.txt",
+                    CreationCollisionOption.ReplaceExisting);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] Exception 2: " + ex.Message);
+                Exceptions.ThrowFullError(ex);
+                return;
+            }
+
+            try
+            {
+                //await 
+                    ApplicationData.Current.LocalFolder.CreateFileAsync("ImgUpd.log", 
+                    CreationCollisionOption.ReplaceExisting);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] Exception 3: " + ex.Message);
+                Exceptions.ThrowFullError(ex);
+                return;
+            }
+
+            try
+            {
+                //await 
+                    ApplicationData.Current.LocalFolder.CreateFileAsync("ImgUpd.log.cbs.log", 
+                    CreationCollisionOption.ReplaceExisting);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] Exception 4: " + ex.Message);
+                Exceptions.ThrowFullError(ex);
+                return;
+            }
+
+            try
+            {
+                await client.Connect();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] Exception C: " + ex.Message);
+                Exceptions.ThrowFullError(ex);
+                return;
+            }
+
+            // Boot logging check
+            try
+            {
+                await 
+                client.Send("bcdedit /enum {default} > " + $"\"{LocalPath}\\cmdstring.txt\"");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] Exception 5: " + ex.Message);
+                Exceptions.ThrowFullError(ex);
+                return;
+            }
+
+            //RnD
+            await Task.Delay(3000);
+
+            string results = "";
+
+            try
+            {
+                results = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] Exception 6: " + ex.Message);
+                Exceptions.ThrowFullError(ex);
+                return;
+            }
+
             if (results.Contains("bootlog                 Yes"))
             {
-                rpc.FileCopy(@"C:\Windows\ntbtlog.txt", $"{LocalPath}\\ntbtlog.txt", 0);
+                try
+                {
+                    rpc.FileCopy(@"C:\Windows\ntbtlog.txt", $"{LocalPath}\\ntbtlog.txt", 0);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] Exception 7: " + ex.Message);
+                    Exceptions.ThrowFullError(ex);
+                    return;
+                }
+
                 IsBootlogEnabled = true;
                 BootLogTog.IsOn = true;
                 SaveLogBtn.IsEnabled = true;
@@ -98,15 +188,29 @@ namespace Logging_Enabler
                 SaveLogBtn.IsEnabled = false;
                 ViewLogBtn.IsEnabled = false;
             }
-            await client.Send("if exist \"C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt\" echo EXISTS > " + $"\"{LocalPath}\\cmdstring.txt\" 2>&1");
-            string results2 = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
-            //Exceptions.CustomMessage(results2);
+
+            // UEFI logging check
+            //await 
+            client.Send("if exist \"C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt\" echo EXISTS > " + $"\"{LocalPath}\\cmdstring.txt\" 2>&1");
+
+            await Task.Delay(2000);
+
+            string results2 = "";
+            try
+            {
+                results2 = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] Exception A: "+ ex.Message);
+                Exceptions.ThrowFullError(ex);
+                return;
+            }
+
             if (results2.Contains("EXISTS"))
             {
                 UefiTog.IsOn = true;
                 IsUefiLogEnabled = true;
-
-
             }
             else
             {
@@ -116,27 +220,43 @@ namespace Logging_Enabler
 
             try
             {
-                uint DumpType;
-                uint dumpType;
-                uint dumpCount;
                 string dumpfolder;
-                // ERROR: The system was unable to find the specified registry key or value.
 
-                await client.Send("reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" > " + $"{LocalPath}\\cmdstring.txt");
-                string localDumpsKey = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                //await 
+
+                client.Send("reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" > " + $"{LocalPath}\\cmdstring.txt");
+
+                string localDumpsKey = "";
+
+                await Task.Delay(2000);
+
+                try
+                {
+                    localDumpsKey = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                }
+                catch (Exception ex2)
+                {
+                    Debug.WriteLine("[ex] Exception D: " + ex2.Message);
+                    Exceptions.ThrowFullError(ex2);
+                    return;
+                }
+
+                // Check if the system was unable to find the specified registry key or value...
                 if (localDumpsKey.Contains("ERROR: The system was unable to find the specified registry key or value."))
                 {
-                    dumpType = 0;
-                    dumpCount = 0;
-                    dumpfolder = "";
-                    
+                    // * Error *
+                   dumpfolder = "";                    
                 }
                 else
                 {
+                    // * Ok *
+                    //await 
+                    client.Send("reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpType > " + $"{LocalPath}\\cmdstring.txt");
 
+                    await Task.Delay(2000);
 
-                    await client.Send("reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpType > " + $"{LocalPath}\\cmdstring.txt");
                     string dumptypeResult = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+
                     if (dumptypeResult.Contains("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps"))
                     {
                         string tempname = dumptypeResult.Replace("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps", "");
@@ -165,17 +285,33 @@ namespace Logging_Enabler
                     }
 
 
+                   //await 
+                   client.Send("reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpCount > " + $"{LocalPath}\\cmdstring.txt");
 
-                   await client.Send("reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpCount > " + $"{LocalPath}\\cmdstring.txt");
-                    string dumpcountResult = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
-                    if (dumpcountResult.Contains("DumpCount    REG_DWORD"))
-                    {
+                   string dumpcountResult = "";
 
-                        string tempname = dumpcountResult.Replace("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps", "");
+                   await Task.Delay(2000);
+
+                   try
+                   {
+                       dumpcountResult = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                   }
+                   catch (Exception ex2)
+                   {
+                        Debug.WriteLine("[ex] Exception E: " + ex2.Message);
+                        Exceptions.ThrowFullError(ex2);
+                       return;
+                   }
+
+                   if (dumpcountResult.Contains("DumpCount    REG_DWORD"))
+                   {
+
+                        string tempname = dumpcountResult.Replace(
+                            "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps", 
+                            "");
                         string tempname2 = tempname.Replace("DumpCount    REG_DWORD", "");
                         string tempresult = Regex.Replace(tempname2, @"\s+", "");
-                       // Exceptions.CustomMessage(tempresult);
-
+                      
                         switch (tempresult)
                         {
                             case "0x0":
@@ -215,39 +351,55 @@ namespace Logging_Enabler
                                 DumpCountCombo.SelectedIndex = 0;
                                 break;
                         }
-
-                    }
-                    else
-                    {
+                   }
+                   else
+                   {
                         DumpCountCombo.SelectedIndex = 0;
-                    }
+                   }
+
+                   //await 
+                   client.Send(
+                       "reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpFolder > " 
+                       + $"{LocalPath}\\cmdstring.txt");
+
+                   await Task.Delay(2000);
+
+                   string dumpfolderResult = "";
+                   try
+                   {
+                      dumpfolderResult = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                   }
+                   catch (Exception ex2)
+                   {
+                        Debug.WriteLine("[ex] Exception F: " + ex2.Message);
+                        Exceptions.ThrowFullError(ex2);
+                       return;
+                   }
 
 
-                    await client.Send("reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpFolder > " + $"{LocalPath}\\cmdstring.txt");
-                    string dumpfolderResult = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
-                    if (dumpfolderResult.Contains("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps"))
-                    {
+                   if (dumpfolderResult.Contains("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps"))
+                   {
 
-                        string tempname = dumpfolderResult.Replace("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps", "");
-                        string tempname2 = tempname.Replace("DumpFolder    REG_EXPAND_SZ", "");
-                        dumpfolder = Regex.Replace(tempname2, @"\s+", "");
-                    }
-                    else
-                    {
-                        Exceptions.CustomMessage(dumpfolderResult + "\nNot found in cmdstring.txt");
-                        dumpfolder = "";
-                    }
+                       string tempname = dumpfolderResult.Replace("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps", "");
+                       string tempname2 = tempname.Replace("DumpFolder    REG_EXPAND_SZ", "");
+                       dumpfolder = Regex.Replace(tempname2, @"\s+", "");
+                   }
+                   else
+                   {
+                       Exceptions.CustomMessage(dumpfolderResult +
+                       "\n***LocalDumps not found in cmdstring.txt***");
+                       dumpfolder = "";
+                   }
 
-
-
-
-
-
-                    DumpsLocationBox.Text = dumpfolder;
+                   DumpsLocationBox.Text = dumpfolder;
                 }
 
-                rpc.FileCopy("C:\\Data\\SystemData\\NonETWLogs\\ImgUpd.log", $"{LocalPath}\\ImgUpd.log", 0);
-                rpc.FileCopy("C:\\Data\\SystemData\\NonETWLogs\\ImgUpd.log.cbs.log", $"{LocalPath}\\ImgUpd.log.cbs.log", 0);
+                rpc.FileCopy("C:\\Data\\SystemData\\NonETWLogs\\ImgUpd.log", 
+                    $"{LocalPath}\\ImgUpd.log", 0);
+
+                rpc.FileCopy("C:\\Data\\SystemData\\NonETWLogs\\ImgUpd.log.cbs.log", 
+                    $"{LocalPath}\\ImgUpd.log.cbs.log",
+                    0);
 
                 BootLogTog.Toggled += BootLogTog_Toggled;
                 UefiTog.Toggled += UefiTog_Toggled;
@@ -257,22 +409,29 @@ namespace Logging_Enabler
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("[ex] Exception G: " + ex.Message);
                 Exceptions.ThrowFullError(ex);
                 AppBusy(false);
-
             }
-        }
+
+        }//CheckLoggingStatus
 
 
-
+        // ViewLogBtn_Click
         private void ViewLogBtn_Click(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
-            string bootLogText = File.ReadAllText($"{LocalPath}\\ntbtlog.txt");
-            BootLogDisplay.Text = bootLogText;
-            AppBusy(false);
-        }
 
+            string bootLogText = File.ReadAllText($"{LocalPath}\\ntbtlog.txt");
+
+            //RnD
+            BootLogDisplay.Text = "[" + bootLogText + "]";
+            AppBusy(false);
+
+        }//ViewLogBtn_Click
+
+
+        // SaveLogBtn_Click
         private async void SaveLogBtn_Click(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
@@ -284,7 +443,7 @@ namespace Logging_Enabler
                 StorageFolder bootSaveFolder = await folderPicker.PickSingleFolderAsync();
                 if (bootSaveFolder == null)
                 {
-
+                    //
                 }
                 else
                 {
@@ -294,19 +453,44 @@ namespace Logging_Enabler
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("[ex] Exception H: " + ex.Message);
                 Exceptions.ThrowFullError(ex);
                 AppBusy(false);
             }
             AppBusy(false);
-        }
 
+        }//SaveLogBtn_Click
+
+
+        // BootLogTog_Toggled
         private async void BootLogTog_Toggled(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
             if (BootLogTog.IsOn)
             {
-                await client.Send("bcdedit /set {default} bootlog Yes > " + $"\"{LocalPath}\\cmdstring.txt\"");
-                string result = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                try
+                {
+                    //await 
+                    client.Send("bcdedit /set {default} bootlog Yes > " 
+                    + $"\"{LocalPath}\\cmdstring.txt\"");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] BootLogTog_Toggled Exception: " + ex.Message);
+                }
+
+                await Task.Delay(2000);
+
+                string result = "";
+
+                try
+                {
+                    result = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] BootLogTog_Toggled Exception: " + ex.Message);
+                }
 
                 if (result.Contains("The operation completed successfully."))
                 {
@@ -327,8 +511,21 @@ namespace Logging_Enabler
             {
                 if (IsBootlogEnabled == true)
                 {
-                    await client.Send("bcdedit /set {default} bootlog No > " + $"\"{LocalPath}\\cmdstring.txt\"");
-                    string result = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                    //await 
+                    client.Send("bcdedit /set {default} bootlog No > " + $"\"{LocalPath}\\cmdstring.txt\"");
+
+                    await Task.Delay(2000);
+
+                    string result = "";
+
+                    try
+                    {
+                        result = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("[ex] BootLogTog_Toggled Exception: " + ex.Message);
+                    }
 
                     if (result.Contains("The operation completed successfully."))
                     {
@@ -347,16 +544,35 @@ namespace Logging_Enabler
                 }
             }
             AppBusy(false);
-        }
 
+        }//BootLogTog_Toggled 
+
+
+        // UefiTog_Toggled
         private async void UefiTog_Toggled(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
             if (UefiTog.IsOn)
             {
-                await client.Send("echo \"Created with Windows Logging Tools by Empyreal96\" > C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt");
-                await client.Send("if exist \"C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt\" echo EXISTS > " + $"\"{LocalPath}\\cmdstring.txt\" 2>&1");
-                string results2 = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                //await 
+                client.Send("echo \"Created with Windows Logging Tools by Empyreal96\" > C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt");
+
+
+                //await 
+                client.Send("if exist \"C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt\" echo EXISTS > " + $"\"{LocalPath}\\cmdstring.txt\" 2>&1");
+
+                await Task.Delay(2000);
+
+                string results2 = "";
+
+                try
+                {
+                    results2 = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] BootLogTog_Toggled Exception: " + ex.Message);
+                }
 
                 if (results2.Contains("EXISTS"))
                 {
@@ -373,51 +589,90 @@ namespace Logging_Enabler
             {
                 if (IsUefiLogEnabled == true)
                 {
-                    await client.Send("del C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt");
+                    //await 
+                    client.Send("del C:\\EFIESP\\Windows\\System32\\Boot\\UEFIChargingLogToDisplay.txt");
+
                     IsUefiLogEnabled = false;
                     Exceptions.CustomMessage("Disabled UEFI logging successfully");
                 }
             }
             AppBusy(false);
-        }
 
+        }//UefiTog_Toggled
+
+
+        // DumpTypeCombo_SelectionChanged
         private async void DumpTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AppBusy(true);
             int value = DumpTypeCombo.SelectedIndex;
 
-            await client.Send($"reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpType /t REG_DWORD /d {value} /f > \"{LocalPath}\\cmdstring.txt\"");
-            string results = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+            //await 
+            client.Send($"reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpType /t REG_DWORD /d {value} /f > \"{LocalPath}\\cmdstring.txt\"");
+
+            await Task.Delay(2000);
+
+            string results = "";
+
+            try
+            {
+                results = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] BootLogTog_Toggled Exception: " + ex.Message);
+            }
+
             if (results.Contains("The operation completed successfully."))
             {
-
+                //
             }
             else
             {
                 Exceptions.CustomMessage("Error setting value for DumpType\n\n" + results);
                 AppBusy(false);
-
             }
             AppBusy(false);
-        }
 
+        }//DumpTypeCombo_SelectionChanged
+
+
+        // DumpCountCombo_SelectionChanged
         private async void DumpCountCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AppBusy(true);
             int result = DumpCountCombo.SelectedIndex;
-            await client.Send($"reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpCount /t REG_DWORD /d {result} /f > \"{LocalPath}\\cmdstring.txt\"");
-            string results = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+            //await 
+            client.Send($"reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpCount /t REG_DWORD /d {result} /f > \"{LocalPath}\\cmdstring.txt\"");
+
+            await Task.Delay(2000);
+
+            string results = "";
+
+            try
+            {
+                results = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex] DumpCount Change exception: " + ex.Message);
+            }
+            
             if (results.Contains("The operation completed successfully."))
             {
-
-            } else
+                //
+            } 
+            else
             {
                 Exceptions.CustomMessage("Error setting value for DumpCount\n\n" + results);
                 AppBusy(false);
             }
             AppBusy(false);
-        }
 
+        }//DumpCountCombo_SelectionChanged
+
+
+        // CrashBrowsebtn_Click
         private async void CrashBrowsebtn_Click(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
@@ -433,9 +688,25 @@ namespace Logging_Enabler
                 try
                 {
                     string savedPath = savedFolder.Path;
+                    
                     //NativeRegistry.WriteMultiString(RegistryHive.HKLM, "SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps", "DumpFolder", savedPath);
-                    await client.Send("reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpFolder /t REG_EXPAND_SZ /d " + $"{savedPath} /f > \"{LocalPath}\\cmdstring.txt\"");
-                    string results3 = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                    
+                    //await 
+                    client.Send("reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\" /v DumpFolder /t REG_EXPAND_SZ /d " + $"{savedPath} /f > \"{LocalPath}\\cmdstring.txt\"");
+
+                    await Task.Delay(2000);
+
+                    string results3 = "";
+
+                    try
+                    {
+                        results3 = File.ReadAllText($"{LocalPath}\\cmdstring.txt");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("[ex] CrashBrowse btn_click Exception: " + ex.Message);
+                    }
+                    
                     if (results3.Contains("The operation completed successfully."))
                     {
                         DumpsLocationBox.Text = savedPath;
@@ -453,15 +724,16 @@ namespace Logging_Enabler
                 }
             }
             AppBusy(false);
-        }
 
+        }//CrashBrowsebtn_Click
+
+
+        // SaveUpdateBasicLog_Click
         private async void SaveUpdateBasicLog_Click(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
             try
             {
-
-
                 StorageFile UpdLogToSave = await ApplicationData.Current.LocalFolder.GetFileAsync("ImgUpd.log");
                 FolderPicker folderPicker = new FolderPicker();
                 folderPicker.FileTypeFilter.Add(".log");
@@ -472,7 +744,8 @@ namespace Logging_Enabler
                 }
                 else
                 {
-                    await UpdLogToSave.CopyAsync(UpdSaveFolder);
+                    //await 
+                    UpdLogToSave.CopyAsync(UpdSaveFolder);
                     Exceptions.CustomMessage("Saved log to " + UpdSaveFolder.Path + "\\" + UpdLogToSave.Name);
                 }
             }
@@ -482,26 +755,48 @@ namespace Logging_Enabler
                 AppBusy(false);
             }
             AppBusy(false);
-        }
 
+        }//SaveUpdateBasicLog_Click
+
+
+        // ViewUpdateBasicLog_Click
         private void ViewUpdateBasicLog_Click(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
-            try
-            {
-                UpdateLogText.Text = "";
-                string UpdLogText = File.ReadAllText($"{LocalPath}\\ImgUpd.log");
 
-                UpdateLogText.Text = UpdLogText;
-            }
-            catch (Exception ex)
+            //UpdateLogText.Text = "";
+            //string UpdLogText = "";
+            //try
+            //{                
+            string UpdLogText = File.ReadAllText($"{LocalPath}\\ImgUpd.log");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Debug.WriteLine("[ex] ViewUpdateBasicLog Exception: " + ex.Message);
+            //    Exceptions.ThrowFullError(ex);
+            //    AppBusy(false);
+            //}
+
+            if (UpdLogText.Length > 10000)
             {
-                Exceptions.ThrowFullError(ex);
-                AppBusy(false);
+                try
+                {
+                    UpdLogText = UpdLogText.Substring(0, 10000) + "...";
+                }
+                catch
+                {
+                }
             }
+
+            UpdateLogText.Text = "[" + UpdLogText + "]";
+            Debug.WriteLine("[" + UpdLogText + "]");
+
             AppBusy(false);
-        }
 
+        }//ViewUpdateBasicLog_Click
+
+
+        // SaveUpdateAdvLog_Click
         private async void SaveUpdateAdvLog_Click(object sender, RoutedEventArgs e)
         {
             AppBusy(true);
@@ -517,7 +812,9 @@ namespace Logging_Enabler
                 }
                 else
                 {
-                    await UpdLogToSave.CopyAsync(UpdSaveFolder);
+                    //await 
+                    UpdLogToSave.CopyAsync(UpdSaveFolder);
+
                     Exceptions.CustomMessage("Saved log to " + UpdSaveFolder.Path + "\\" + UpdLogToSave.Name);
                 }
             }
@@ -527,24 +824,35 @@ namespace Logging_Enabler
                 Exceptions.ThrowFullError(ex);
                 AppBusy(false);
             }
+            
             AppBusy(false);
-        }
 
+        }//SaveUpdateAdvLog_Click
+
+
+        // ViewUpdateAdvLog_Click
         private void ViewUpdateAdvLog_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                UpdateLogText.Text = "";
-                string UpdLogText = File.ReadAllText($"{LocalPath}\\ImgUpd.log.cbs.log");
+            UpdateLogText.Text = "";
+            string UpdLogText = "";
 
-                UpdateLogText.Text = UpdLogText;
+            try
+            {                
+                UpdLogText = File.ReadAllText($"{LocalPath}\\ImgUpd.log.cbs.log");
+                
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("[ex] ViewUpdateAdvLog_Click exception: " + ex.Message);
                 Exceptions.ThrowFullError(ex);
             }
-        }
 
+            UpdateLogText.Text = UpdLogText;
+
+        }//ViewUpdateAdvLog_Click
+
+
+        // AppBusy
         private void AppBusy(bool enable)
         {
             if (enable == true)
@@ -552,12 +860,16 @@ namespace Logging_Enabler
                 AppBusyBar.IsEnabled = true;
                 AppBusyBar.Visibility = Visibility.Visible;
                 AppBusyBar.IsIndeterminate = true;
-            } else
+            } 
+            else
             {
                 AppBusyBar.IsEnabled = false;
                 AppBusyBar.Visibility = Visibility.Collapsed;
                 AppBusyBar.IsIndeterminate = false;
             }
-        }
-    }
-}
+
+        }//AppBusy end
+
+    }//mainPage class end
+
+}//Logging_Enabler namespace end
